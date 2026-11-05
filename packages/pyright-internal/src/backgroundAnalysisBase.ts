@@ -181,19 +181,21 @@ export class BackgroundAnalysisBase implements IBackgroundAnalysis {
         const { port1, port2 } = new MessageChannel();
         const waiter = getBackgroundWaiter<boolean>(port1);
 
-        const cancellationId = getCancellationTokenId(token);
-        this.enqueueRequest({
-            requestType: 'analyzeFile',
-            data: serialize({ fileUri, cancellationId }),
-            port: port2,
-        });
+        try {
+            const cancellationId = getCancellationTokenId(token);
+            this.enqueueRequest({
+                requestType: 'analyzeFile',
+                data: serialize({ fileUri, cancellationId }),
+                port: port2,
+            });
 
-        const result = await waiter;
+            const result = await waiter;
 
-        port2.close();
-        port1.close();
-
-        return result;
+            return result;
+        } finally {
+            port2.close();
+            port1.close();
+        }
     }
 
     async analyzeFileAndGetDiagnostics(fileUri: Uri, token: CancellationToken): Promise<Diagnostic[]> {
@@ -202,19 +204,21 @@ export class BackgroundAnalysisBase implements IBackgroundAnalysis {
         const { port1, port2 } = new MessageChannel();
         const waiter = getBackgroundWaiter<Diagnostic[]>(port1);
 
-        const cancellationId = getCancellationTokenId(token);
-        this.enqueueRequest({
-            requestType: 'analyzeFileAndGetDiagnostics',
-            data: serialize({ fileUri, cancellationId }),
-            port: port2,
-        });
+        try {
+            const cancellationId = getCancellationTokenId(token);
+            this.enqueueRequest({
+                requestType: 'analyzeFileAndGetDiagnostics',
+                data: serialize({ fileUri, cancellationId }),
+                port: port2,
+            });
 
-        const result = await waiter;
+            const result = await waiter;
 
-        port2.close();
-        port1.close();
-
-        return convertDiagnostics(result);
+            return convertDiagnostics(result);
+        } finally {
+            port2.close();
+            port1.close();
+        }
     }
 
     async getDiagnosticsForRange(fileUri: Uri, range: Range, token: CancellationToken): Promise<Diagnostic[]> {
@@ -223,19 +227,21 @@ export class BackgroundAnalysisBase implements IBackgroundAnalysis {
         const { port1, port2 } = new MessageChannel();
         const waiter = getBackgroundWaiter<Diagnostic[]>(port1);
 
-        const cancellationId = getCancellationTokenId(token);
-        this.enqueueRequest({
-            requestType: 'getDiagnosticsForRange',
-            data: serialize({ fileUri, range, cancellationId }),
-            port: port2,
-        });
+        try {
+            const cancellationId = getCancellationTokenId(token);
+            this.enqueueRequest({
+                requestType: 'getDiagnosticsForRange',
+                data: serialize({ fileUri, range, cancellationId }),
+                port: port2,
+            });
 
-        const result = await waiter;
+            const result = await waiter;
 
-        port2.close();
-        port1.close();
-
-        return convertDiagnostics(result);
+            return convertDiagnostics(result);
+        } finally {
+            port2.close();
+            port1.close();
+        }
     }
 
     async generateTypeStubFiles(
@@ -247,18 +253,21 @@ export class BackgroundAnalysisBase implements IBackgroundAnalysis {
         const { port1, port2 } = new MessageChannel();
         const waiter = getBackgroundWaiter<TypeStubGenerationResult>(port1);
 
-        const cancellationId = getCancellationTokenId(token);
-        this.enqueueRequest({
-            requestType: 'generateTypeStubFiles',
-            data: serialize({ plan, cancellationId }),
-            port: port2,
-        });
+        try {
+            const cancellationId = getCancellationTokenId(token);
+            this.enqueueRequest({
+                requestType: 'generateTypeStubFiles',
+                data: serialize({ plan, cancellationId }),
+                port: port2,
+            });
 
-        const result = await waiter;
+            const result = await waiter;
 
-        port2.close();
-        port1.close();
-        return result;
+            return result;
+        } finally {
+            port2.close();
+            port1.close();
+        }
     }
 
     invalidateAndForceReanalysis(reason: InvalidatedReason) {
